@@ -26,7 +26,7 @@ echo "Creating database: perfreporting"
 $POSTGRES <<-EOSQL
 CREATE DATABASE perfreporting OWNER perfeng;
 \connect perfreporting;
-CREATE TABLE IF NOT EXISTS jmeterResults (
+CREATE TABLE IF NOT EXISTS results (
     id SERIAL PRIMARY KEY,
     job VARCHAR(255),
     runnumber INT,
