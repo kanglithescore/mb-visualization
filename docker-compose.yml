@@ -1,34 +1,64 @@
-version: "3"
+version: "3.9"
 services:
-
   postgres-db:
-    image: postgres
+    image: postgres:latest
+    container_name: postgresql_4_metabase
+    hostname: postgres-db
     restart: always
     ports:
       - 5432:5432
-    environment:
-      POSTGRES_PASSWORD: postgres
-      PGDATA: /var/lib/postgresql/data
     volumes:
-      # declare your mount volume /host/dir:/container/dir
+      # declare your mount volume
       - "${PWD}/data/postgres:/var/lib/postgresql/data"
       - "${PWD}/init/postgres/:/docker-entrypoint-initdb.d/"
+    environment:
+      PGDATA: /var/lib/postgresql/data
+      POSTGRES_DB: metabase
+      POSTGRES_USER_FILE: /run/secrets/db_user
+      POSTGRES_PASSWORD_FILE: /run/secrets/db_password
+    networks:
+      - jenkins
+    secrets:
+      - db_user
+      - db_password
     # user: "0"
-
   metabase-app:
-    image: metabase/metabase
+    image: metabase/metabase:latest
     restart: always
+    container_name: metabase
+    hostname: metabase
     ports:
+      # map to local port 3001
       - 3001:3000
     volumes:
-      # declare your mount volume /host/dir:/container/dir
+      # declare your mount volume
       - "${PWD}/data/metabase:/metabase-data"
+      - /dev/urandom:/dev/random:ro
     environment:
       MB_DB_TYPE: postgres
       MB_DB_DBNAME: metabase
       MB_DB_PORT: 5432
-      MB_DB_USER: metabase
-      MB_DB_PASS: metabase
+      MB_DB_USER_FILE: /run/secrets/db_user
+      MB_DB_PASS_FILE: /run/secrets/db_password
       MB_DB_HOST: postgres-db
+    networks:
+      - jenkins
+    secrets:
+      - db_user
+      - db_password
+    healthcheck:
+      test: curl --fail -I http://localhost:3001/api/health || exit 1
+      interval: 15s
+      timeout: 5s
+      retries: 5
     depends_on:
       - postgres-db
+networks:
+  jenkins:
+    name: jenkins
+    driver: bridge
+secrets:
+   db_password:
+     file: db_password.txt
+   db_user:
+     file: db_user.txt

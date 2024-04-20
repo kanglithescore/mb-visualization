@@ -1,17 +1,17 @@
 #!/bin/bash
 
-# Create metabase database named perfreporting owned by metabase user to store
+# Create a database named perfreporting owned by perfeng user to store
 # the performance test data.
 
 set -e
 
-PERF_PASSWORD="epDbPassword"
-POSTGRES="psql --username postgres"
+PERF_PASSWORD="shock"
+POSTGRES="psql --username metabase"
 
 # create a shared role to read & write general datasets into postgres perfdb
-echo "Creating database role: epdbuser"
+echo "Creating database role: perfeng"
 $POSTGRES <<-EOSQL
-CREATE USER epdbuser WITH
+CREATE USER perfeng WITH
     LOGIN
     SUPERUSER
     CREATEDB
@@ -24,7 +24,7 @@ EOSQL
 # create database
 echo "Creating database: perfreporting"
 $POSTGRES <<-EOSQL
-CREATE DATABASE perfreporting OWNER epdbuser;
+CREATE DATABASE perfreporting OWNER perfeng;
 \connect perfreporting;
 CREATE TABLE IF NOT EXISTS jmeterResults (
     id SERIAL PRIMARY KEY,
@@ -32,12 +32,13 @@ CREATE TABLE IF NOT EXISTS jmeterResults (
     runnumber INT,
     project VARCHAR(255),
     product VARCHAR(255),
+    release VARCHAR(255),    
     build VARCHAR(255),
-    productbranch VARCHAR(255),
+    servicebranch VARCHAR(255),
     deploybranch VARCHAR(255),
-    dockerbranch VARCHAR(255),
     testtype VARCHAR(255),
     testname VARCHAR(255),
+    testscript VARCHAR(255),
     description TEXT,
     jurisdiction VARCHAR(255),
     cluster VARCHAR(255),
