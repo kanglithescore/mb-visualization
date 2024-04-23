@@ -25,9 +25,12 @@ def process_files(rate_file, avg_file, p95_file, output_filename, business_flow,
     
     # Calculate averages
     avg_request_rate = rate_data.groupby('group')['value'].mean().round(2)
-    avg_latency = (avg_latency_data.groupby('group')['value'].mean() * 1000).astype(int)
-    avg_p95_latency = (p95_latency_data.groupby('group')['value'].mean() * 1000).astype(int)
-    
+    if business_flow in ["PlaceBets", "ValidateBets"]:
+        avg_latency = (avg_latency_data.groupby('group')['value'].mean() * 1000).astype(int)
+        avg_p95_latency = (p95_latency_data.groupby('group')['value'].mean() * 1000).astype(int)
+    else:
+        avg_latency = (avg_latency_data.groupby('group')['value'].mean()).astype(int)
+        avg_p95_latency = (p95_latency_data.groupby('group')['value'].mean()).astype(int)
     # Determine start and end times
     start_time = rate_data.groupby('group')['time'].min()
     end_time = rate_data.groupby('group')['time'].max()
