@@ -50,8 +50,8 @@ def read_csv_and_write_to_db(csv_file: str):
 def write_transaction_metabase(txn_summary: dict):
     """Write transaction summary metric to metabase postgresql database."""
     try:
-        time.sleep(1)
-        print(f"Metabase RDS PostgreSQL host name is: {METABASE_HOST}")
+        time.sleep(0.5)
+        print(f"Metabase PostgreSQL host name is: {METABASE_HOST}")
         connection = psycopg2.connect(user=METABASE_USER, password=METABASE_PASSWORD, host=METABASE_HOST, port=METABASE_PORT, database=METABASE_DB)
         cursor = connection.cursor()
 
@@ -63,7 +63,7 @@ def write_transaction_metabase(txn_summary: dict):
         cursor.execute(insert_query, list(txn_summary.values()))
         connection.commit()
 
-        print(f"Transaction [{txn_summary.get('transactionname')}] metrics inserted to the Metabase successfully")
+        print(f"Transaction [{txn_summary.get('businessprocess')}] metrics inserted to the Metabase successfully")
     except (Exception, psycopg2.Error) as e:
         print(f"Error while connecting to Metabase PostgreSQL: {e}")
     finally:
