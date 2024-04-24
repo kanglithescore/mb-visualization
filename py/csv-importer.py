@@ -1,13 +1,13 @@
 """
 Transaction data in a CSV tile to Metabase PostgreSQL DB.
 
-This script processes a CSV file containing transaction data and writes it to a PostgreSQL database in Metabase.
+This script processes a directory which contains the CSV file with transaction data and writes it to a PostgreSQL database in Metabase.
 
 Usage:
-    python script_name.py <csv_file>
+    python script_name.py <directory>
 
 Parameters:
-    csv_file (str): The path to the CSV file containing transaction data.
+    csv_file (str): The directory to the CSV file containing transaction data.
 
 Environment Variables:
     METABASE_HOST (str): The hostname of the Metabase RDS PostgreSQL database. If not set, the default value is used.
@@ -21,7 +21,7 @@ Functions:
     - write_transaction_metabase(txn_summary: dict): Writes transaction summary metrics to the Metabase PostgreSQL database.
 
 Example:
-    python script_name.py transactions.csv
+    python script_name.py directory
 """
 
 import argparse
@@ -73,9 +73,18 @@ def write_transaction_metabase(txn_summary: dict):
             print("Metabase PostgreSQL connection is closed")
 
 
+def process_directory(directory: str):
+    """Process each CSV file in the specified directory."""
+    for filename in os.listdir(directory):
+        if filename.endswith('.csv'):
+            csv_file = os.path.join(directory, filename)
+            print(f"Processing file: {csv_file}")
+            read_csv_and_write_to_db(csv_file)
+
+
 if __name__ == '__main__':
-    parser = argparse.ArgumentParser(description='Process a CSV file contained the transactions and write to Metabase DB.')
-    parser.add_argument('csv_file', type=str, help='The path to the CSV file to process.')
+    parser = argparse.ArgumentParser(description='Process CSV files contained in a directory and write to Metabase DB.')
+    parser.add_argument('directory', type=str, help='The directory containing CSV files to process.')
     args = parser.parse_args()
 
-    read_csv_and_write_to_db(args.csv_file)
+    process_directory(args.directory)
