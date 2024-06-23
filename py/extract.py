@@ -26,10 +26,11 @@ def extract(query, start_at, end_at, time_delta, jurisdiction):
     value_list = []
     metric_list = []
 
-    iteration_end = start_at + time_delta
+    iteration_start = start_at
 
-    while iteration_end <= end_at:
-        results = api.Metric.query(start=start_at, end=iteration_end, query=query["query"])
+    while iteration_start < end_at:
+        iteration_end = min(iteration_start + time_delta, end_at)
+        results = api.Metric.query(start=iteration_start, end=iteration_end, query=query["query"])
         for datadog_result in results['series']:
             for time_value_pair_list in datadog_result['pointlist']:
                 timestamp = time_value_pair_list[0] / 1000
@@ -37,13 +38,12 @@ def extract(query, start_at, end_at, time_delta, jurisdiction):
                 datetime_list.append(converted_datetime)
                 if query["metric"].startswith("latency"):
                     # Convert second to millisecond if it's latency
-                    value_list.append(time_value_pair_list[1]*1000)
+                    value_list.append(time_value_pair_list[1] * 1000)
                 else:
                     value_list.append(time_value_pair_list[1])
                 metric_list.append(datadog_result['metric'])
 
-        start_at = iteration_end
-        iteration_end += time_delta
+        iteration_start = iteration_end
 
     all_data = {
         'timestamp': datetime_list,
