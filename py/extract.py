@@ -19,7 +19,7 @@ def load_queries(config_file):
     return config['queries']
 
 # Function to extract data for a given query
-def extract(query, start_at, end_at, time_delta, jurisdiction):
+def extract(query, start_at, end_at, time_delta, jurisdiction, default_timestamps=None):
     print(f'Running extraction for query: {query["metric"]}')
 
     datetime_list = []
@@ -37,18 +37,24 @@ def extract(query, start_at, end_at, time_delta, jurisdiction):
                 converted_datetime = datetime.utcfromtimestamp(timestamp).strftime('%Y-%m-%dT%H:%M:%S.%f')[:-3] + 'Z'
                 datetime_list.append(converted_datetime)
                 if query["metric"].startswith("latency"):
-                    # Convert second to millisecond if it's latency
-                    value_list.append(time_value_pair_list[1] * 1000)
+                    value_list.append(time_value_pair_list[1] * 1000)  # Convert to milliseconds
                 else:
                     value_list.append(time_value_pair_list[1])
                 metric_list.append(datadog_result['metric'])
 
         iteration_start = iteration_end
 
+    if not datetime_list and default_timestamps is not None:
+        datetime_list = default_timestamps
+        value_list = [0] * len(default_timestamps)
+        jurisdiction_list = [jurisdiction] * len(default_timestamps)
+    else:
+        jurisdiction_list = [jurisdiction] * len(datetime_list)
+
     all_data = {
         'timestamp': datetime_list,
         'value': value_list,
-        'jurisdiction': jurisdiction
+        'jurisdiction': jurisdiction_list
     }
 
     print(f'Finished extraction for query: {query["metric"]}')
@@ -75,6 +81,9 @@ def run_queries(queries, start, end, time_delta):
     today = datetime.now().strftime('%Y%m%d')
     root_dir = os.path.join(today, 'extract')
 
+    # Default timestamps to ensure consistency
+    default_timestamps = None
+
     for query in queries:
         if "jurisdiction" in query:
             jurisdiction = query.get("jurisdiction")
@@ -84,7 +93,11 @@ def run_queries(queries, start, end, time_delta):
         if not os.path.exists(category_dir):
             os.makedirs(category_dir)
         
-        data_metrics = extract(query, start, end, time_delta, jurisdiction)
+        data_metrics = extract(query, start, end, time_delta, jurisdiction, default_timestamps)
+        
+        if default_timestamps is None:
+            default_timestamps = data_metrics['timestamp'].tolist()
+        
         csv_file_name = f"{category_dir}/{query['metric']}.csv"
         data_metrics.to_csv(csv_file_name, index=False)
         print(f"Data has been written to {csv_file_name}")
