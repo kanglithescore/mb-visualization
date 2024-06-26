@@ -2,7 +2,7 @@
     "queries": [
         {
             "category": "sportsbook",
-            "metric": "latency-p95",
+            "metric": "latency",
             "jurisdiction": "us-pa-ps",
             "query": "p95:trace.request{env:ps,service:sportsbook,jurisdiction:us-pa}"
         },
@@ -25,8 +25,56 @@
             "query": "sum:trace.request.errors{env:ps,jurisdiction:us-pa,service:sportsbook}.as_count()"
         },
         {
+            "category": "concierge",
+            "metric": "latency",
+            "jurisdiction": "us-pa-ps",
+            "query": "p95:trace.request{env:ps,service:concierge,jurisdiction:us-pa}"
+        },
+        {
+            "category": "concierge",
+            "metric": "request-rate",
+            "jurisdiction": "us-pa-ps",
+            "query": "sum:trace.request.hits{env:ps,service:concierge,jurisdiction:us-pa}.as_rate()"
+        },
+        {
+            "category": "concierge",
+            "metric": "request-hits",
+            "jurisdiction": "us-pa-ps",
+            "query": "sum:trace.request.hits{env:ps,jurisdiction:us-pa,service:concierge}.as_count()"
+        },
+        {
+            "category": "concierge",
+            "metric": "request-error",
+            "jurisdiction": "us-pa-ps",
+            "query": "sum:trace.request.errors{env:ps,jurisdiction:us-pa,service:sportsconciergebook}.as_count()"
+        },
+        {
+            "category": "edgebook",
+            "metric": "latency",
+            "jurisdiction": "us-pa-ps",
+            "query": "p95:trace.request{env:ps,service:edgebook,jurisdiction:us-pa}"
+        },
+        {
+            "category": "edgebook",
+            "metric": "request-rate",
+            "jurisdiction": "us-pa-ps",
+            "query": "sum:trace.request.hits{env:ps,service:edgebook,jurisdiction:us-pa}.as_rate()"
+        },
+        {
+            "category": "edgebook",
+            "metric": "request-hits",
+            "jurisdiction": "us-pa-ps",
+            "query": "sum:trace.request.hits{env:ps,jurisdiction:us-pa,service:edgebook}.as_count()"
+        },
+        {
+            "category": "edgebook",
+            "metric": "request-error",
+            "jurisdiction": "us-pa-ps",
+            "query": "sum:trace.request.errors{env:ps,jurisdiction:us-pa,service:edgebook}.as_count()"
+        },      
+        {
             "category": "placebets",
-            "metric": "latency-p95",
+            "metric": "latency",
             "jurisdiction": "us-pa-ps",
             "query": "p95:trace.request{env:ps,jurisdiction:us-pa,resource:3284c1ccae981476,service:edgebook}"
         },
@@ -50,7 +98,7 @@
         },
         {
             "category": "validatebets",
-            "metric": "latency-p95",
+            "metric": "latency",
             "jurisdiction": "us-pa-ps",
             "query": "p95:trace.request{env:ps,jurisdiction:us-pa,resource:d4b0511455ea0ccb,service:edgebook}"
         },
