@@ -359,6 +359,30 @@
             "metric": "request-error",
             "jurisdiction": "us-core-ps",
             "query": "sum:identity.access_token_requests.count{env:ps,service:identity,grant_type:password}.as_count()"
+        },
+        {
+            "category": "loginrefreshtoken",
+            "metric": "request-rate",
+            "jurisdiction": "us-core-ps",
+            "query": "sum:identity.access_token_requests.count{env:ps,service:identity,grant_type:refresh_token}.as_rate()"
+        },
+        {
+            "category": "loginrefreshtoken",
+            "metric": "latency",
+            "jurisdiction": "us-core-ps",
+            "query": "avg:identity.access_token_requests.95percentile{env:ps,grant_type:refresh_token}"
+        },
+        {
+            "category": "loginrefreshtoken",
+            "metric": "request-hits",
+            "jurisdiction": "us-core-ps",
+            "query": "sum:identity.access_token_requests.count{env:ps,service:identity,grant_type:refresh_token}.as_count()"
+        },
+        {
+            "category": "loginrefreshtoken",
+            "metric": "request-error",
+            "jurisdiction": "us-core-ps",
+            "query": "sum:identity.access_token_requests.count{env:ps,service:identity,grant_type:refresh_token}.as_count()"
         }
     ]
 }
