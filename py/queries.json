@@ -358,7 +358,7 @@
             "category": "loginpassword",
             "metric": "request-error",
             "jurisdiction": "us-core-ps",
-            "query": "sum:identity.access_token_requests.count{env:ps,service:identity,grant_type:password}.as_count()"
+            "query": "sum:identity.access_token_requests.count{env:ps,service:identity,grant_type:password,status:500}.as_count()"
         },
         {
             "category": "loginrefreshtoken",
@@ -382,7 +382,7 @@
             "category": "loginrefreshtoken",
             "metric": "request-error",
             "jurisdiction": "us-core-ps",
-            "query": "sum:identity.access_token_requests.count{env:ps,service:identity,grant_type:refresh_token}.as_count()"
+            "query": "sum:identity.access_token_requests.count{env:ps,service:identity,grant_type:refresh_token,status:500}.as_count()"
         }
     ]
 }
