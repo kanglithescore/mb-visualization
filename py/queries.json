@@ -2,15 +2,15 @@
     "queries": [
         {
             "category": "sportsbook",
-            "metric": "latency",
-            "jurisdiction": "us-pa-ps",
-            "query": "p95:trace.request{env:ps,service:sportsbook,jurisdiction:us-pa}"
-        },
-        {
-            "category": "sportsbook",
             "metric": "request-rate",
             "jurisdiction": "us-pa-ps",
             "query": "sum:trace.request.hits{env:ps,service:sportsbook,jurisdiction:us-pa}.as_rate()"
+        },
+        {
+            "category": "sportsbook",
+            "metric": "latency",
+            "jurisdiction": "us-pa-ps",
+            "query": "p95:trace.request{env:ps,service:sportsbook,jurisdiction:us-pa}"
         },
         {
             "category": "sportsbook",
@@ -26,15 +26,15 @@
         },
         {
             "category": "concierge",
-            "metric": "latency",
-            "jurisdiction": "us-pa-ps",
-            "query": "p95:trace.request{env:ps,service:concierge,jurisdiction:us-pa}"
-        },
-        {
-            "category": "concierge",
             "metric": "request-rate",
             "jurisdiction": "us-pa-ps",
             "query": "sum:trace.request.hits{env:ps,service:concierge,jurisdiction:us-pa}.as_rate()"
+        },
+        {
+            "category": "concierge",
+            "metric": "latency",
+            "jurisdiction": "us-pa-ps",
+            "query": "p95:trace.request{env:ps,service:concierge,jurisdiction:us-pa}"
         },
         {
             "category": "concierge",
@@ -50,15 +50,15 @@
         },
         {
             "category": "edgebook",
-            "metric": "latency",
-            "jurisdiction": "us-pa-ps",
-            "query": "p95:trace.request{env:ps,service:edgebook,jurisdiction:us-pa}"
-        },
-        {
-            "category": "edgebook",
             "metric": "request-rate",
             "jurisdiction": "us-pa-ps",
             "query": "sum:trace.request.hits{env:ps,service:edgebook,jurisdiction:us-pa}.as_rate()"
+        },
+        {
+            "category": "edgebook",
+            "metric": "latency",
+            "jurisdiction": "us-pa-ps",
+            "query": "p95:trace.request{env:ps,service:edgebook,jurisdiction:us-pa}"
         },
         {
             "category": "edgebook",
@@ -71,18 +71,162 @@
             "metric": "request-error",
             "jurisdiction": "us-pa-ps",
             "query": "sum:trace.request.errors{env:ps,jurisdiction:us-pa,service:edgebook}.as_count()"
-        },      
+        },
         {
-            "category": "placebets",
+            "category": "vegas",
+            "metric": "request-rate",
+            "jurisdiction": "us-core-ps",
+            "query": "sum:trace.request.hits{env:ps,service:vegas}.as_rate()"
+        },  
+        {
+            "category": "vegas",
+            "metric": "latency",
+            "jurisdiction": "us-core-ps",
+            "query": "p95:trace.request{env:ps,service:vegas}"
+        },
+        {
+            "category": "vegas",
+            "metric": "request-hits",
+            "jurisdiction": "us-core-ps",
+            "query": "sum:trace.request.hits{env:ps,service:vegas}.as_count()"
+        },
+        {
+            "category": "vegas",
+            "metric": "request-error",
+            "jurisdiction": "us-core-ps",
+            "query": "sum:trace.request.errors{env:ps,service:vegas}.as_count()"
+        },
+        {
+            "category": "identity",
+            "metric": "request-rate",
+            "jurisdiction": "us-core-ps",
+            "query": "sum:trace.request.hits{env:ps,service:identity}.as_rate()"
+        },  
+        {
+            "category": "identity",
+            "metric": "latency",
+            "jurisdiction": "us-core-ps",
+            "query": "p95:trace.request{env:ps,service:identity}"
+        },
+        {
+            "category": "identity",
+            "metric": "request-hits",
+            "jurisdiction": "us-core-ps",
+            "query": "sum:trace.request.hits{env:ps,service:identity}.as_count()"
+        },
+        {
+            "category": "identity",
+            "metric": "request-error",
+            "jurisdiction": "us-core-ps",
+            "query": "sum:trace.request.errors{env:ps,service:identity}.as_count()"
+        },
+        {
+            "category": "corebook",
+            "metric": "request-rate",
+            "jurisdiction": "us-core-ps",
+            "query": "sum:trace.request.hits{env:ps,service:corebook}.as_rate()"
+        },  
+        {
+            "category": "corebook",
+            "metric": "latency",
+            "jurisdiction": "us-core-ps",
+            "query": "p95:trace.request{env:ps,service:corebook}"
+        },
+        {
+            "category": "corebook",
+            "metric": "request-hits",
+            "jurisdiction": "us-core-ps",
+            "query": "sum:trace.request.hits{env:ps,service:corebook}.as_count()"
+        },
+        {
+            "category": "corebook",
+            "metric": "request-error",
+            "jurisdiction": "us-core-ps",
+            "query": "sum:trace.request.errors{env:ps,service:corebook}.as_count()"
+        },
+        {
+            "category": "promotions",
+            "metric": "request-rate",
+            "jurisdiction": "us-core-ps",
+            "query": "sum:trace.request.hits{env:ps,service:promotions}.as_rate()"
+        },  
+        {
+            "category": "promotions",
+            "metric": "latency",
+            "jurisdiction": "us-core-ps",
+            "query": "p95:trace.request{env:ps,service:promotions}"
+        },
+        {
+            "category": "promotions",
+            "metric": "request-hits",
+            "jurisdiction": "us-core-ps",
+            "query": "sum:trace.request.hits{env:ps,service:promotions}.as_count()"
+        },
+        {
+            "category": "promotions",
+            "metric": "request-error",
+            "jurisdiction": "us-core-ps",
+            "query": "sum:trace.request.errors{env:ps,service:promotions}.as_count()"
+        },
+        {
+            "category": "casino",
+            "metric": "request-rate",
+            "jurisdiction": "us-pa-ps",
+            "query": "sum:trace.request.hits{env:ps,service:casino,jurisdiction:us-pa}.as_rate()"
+        },
+        {
+            "category": "casino",
             "metric": "latency",
             "jurisdiction": "us-pa-ps",
-            "query": "p95:trace.request{env:ps,jurisdiction:us-pa,resource:3284c1ccae981476,service:edgebook}"
+            "query": "p95:trace.request{env:ps,service:casino,jurisdiction:us-pa}"
+        },
+        {
+            "category": "casino",
+            "metric": "request-hits",
+            "jurisdiction": "us-pa-ps",
+            "query": "sum:trace.request.hits{env:ps,jurisdiction:us-pa,service:casino}.as_count()"
+        },
+        {
+            "category": "casino",
+            "metric": "request-error",
+            "jurisdiction": "us-pa-ps",
+            "query": "sum:trace.request.errors{env:ps,jurisdiction:us-pa,service:casino}.as_count()"
+        },
+        {
+            "category": "scorepay",
+            "metric": "request-rate",
+            "jurisdiction": "us-core-ps",
+            "query": "sum:trace.request.hits{env:ps,service:scorepay}.as_rate()"
+        },  
+        {
+            "category": "scorepay",
+            "metric": "latency",
+            "jurisdiction": "us-core-ps",
+            "query": "p95:trace.request{env:ps,service:scorepay}"
+        },
+        {
+            "category": "scorepay",
+            "metric": "request-hits",
+            "jurisdiction": "us-core-ps",
+            "query": "sum:trace.request.hits{env:ps,service:scorepay}.as_count()"
+        },
+        {
+            "category": "scorepay",
+            "metric": "request-error",
+            "jurisdiction": "us-core-ps",
+            "query": "sum:trace.request.errors{env:ps,service:scorepay}.as_count()"
         },
         {
             "category": "placebets",
             "metric": "request-rate",
             "jurisdiction": "us-pa-ps",
             "query": "sum:trace.request.hits{env:ps,jurisdiction:us-pa,resource:3284c1ccae981476,service:edgebook}.as_rate()"
+        },
+        {
+            "category": "placebets",
+            "metric": "latency",
+            "jurisdiction": "us-pa-ps",
+            "query": "p95:trace.request{env:ps,jurisdiction:us-pa,resource:3284c1ccae981476,service:edgebook}"
         },
         {
             "category": "placebets",
@@ -98,15 +242,15 @@
         },
         {
             "category": "validatebets",
-            "metric": "latency",
-            "jurisdiction": "us-pa-ps",
-            "query": "p95:trace.request{env:ps,jurisdiction:us-pa,resource:d4b0511455ea0ccb,service:edgebook}"
-        },
-        {
-            "category": "validatebets",
             "metric": "request-rate",
             "jurisdiction": "us-pa-ps",
             "query": "sum:trace.request.hits{env:ps,jurisdiction:us-pa,resource:d4b0511455ea0ccb,service:edgebook}.as_rate()"
+        },
+        {
+            "category": "validatebets",
+            "metric": "latency",
+            "jurisdiction": "us-pa-ps",
+            "query": "p95:trace.request{env:ps,jurisdiction:us-pa,resource:d4b0511455ea0ccb,service:edgebook}"
         },
         {
             "category": "validatebets",
@@ -119,6 +263,102 @@
             "metric": "request-error",
             "jurisdiction": "us-pa-ps",
             "query": "sum:trace.request.errors{env:ps,jurisdiction:us-pa,resource:d4b0511455ea0ccb,service:edgebook}.as_count()"
+        },
+        {
+            "category": "deposits",
+            "metric": "request-rate",
+            "jurisdiction": "us-core-ps",
+            "query": "sum:trace.oban_job.hits{env:ps,resource:23beebeb65cf68be,service:scorepay}.as_rate()"
+        },
+        {
+            "category": "deposits",
+            "metric": "latency",
+            "jurisdiction": "us-core-ps",
+            "query": "p95:trace.oban_job{env:ps,resource:23beebeb65cf68be,service:scorepay}"
+        },
+        {
+            "category": "deposits",
+            "metric": "request-hits",
+            "jurisdiction": "us-core-ps",
+            "query": "sum:trace.oban_job.hits{env:ps,resource:23beebeb65cf68be,service:scorepay}.as_count()"
+        },
+        {
+            "category": "deposits",
+            "metric": "request-error",
+            "jurisdiction": "us-core-ps",
+            "query": "sum:trace.oban_job.errors{env:ps,resource:23beebeb65cf68be,service:scorepay}.as_count()"
+        },
+        {
+            "category": "withdrawal",
+            "metric": "request-rate",
+            "jurisdiction": "us-core-ps",
+            "query": "sum:trace.oban_job.hits{env:ps,resource:1b6e64ebc7dda65a,service:scorepay}.as_rate()"
+        },
+        {
+            "category": "withdrawal",
+            "metric": "latency",
+            "jurisdiction": "us-core-ps",
+            "query": "p95:trace.oban_job{env:ps,resource:1b6e64ebc7dda65a,service:scorepay}"
+        },
+        {
+            "category": "withdrawal",
+            "metric": "request-hits",
+            "jurisdiction": "us-core-ps",
+            "query": "sum:trace.oban_job.hits{env:ps,resource:1b6e64ebc7dda65a,service:scorepay}.as_count()"
+        },
+        {
+            "category": "withdrawal",
+            "metric": "request-error",
+            "jurisdiction": "us-core-ps",
+            "query": "sum:trace.oban_job.errors{env:ps,resource:1b6e64ebc7dda65a,service:scorepay}.as_count()"
+        },
+        {
+            "category": "cashouttrigger",
+            "metric": "request-rate",
+            "jurisdiction": "us-pa-ps",
+            "query": "avg:absinthe.execute.operation.count{env:ps,operation_name:cashouttrigger,jurisdiction:us-pa}.as_rate()"
+        },
+        {
+            "category": "cashouttrigger",
+            "metric": "latency",
+            "jurisdiction": "us-pa-ps",
+            "query": "p95:trace.request{env:ps,jurisdiction:us-pa,resource:a136d74a4239a377,service:edgebook}"
+        },
+        {
+            "category": "cashouttrigger",
+            "metric": "request-hits",
+            "jurisdiction": "us-pa-ps",
+            "query": "sum:trace.request.hits{env:ps,jurisdiction:us-pa,resource:a136d74a4239a377,service:edgebook}.as_count()"
+        },
+        {
+            "category": "cashouttrigger",
+            "metric": "request-error",
+            "jurisdiction": "us-pa-ps",
+            "query": "sum:trace.request.errors{env:ps,jurisdiction:us-pa,resource:a136d74a4239a377,service:edgebook}.as_count()"
+        },
+        {
+            "category": "loginpassword",
+            "metric": "request-rate",
+            "jurisdiction": "us-core-ps",
+            "query": "sum:identity.access_token_requests.count{env:ps,service:identity,grant_type:password}.as_rate()"
+        },
+        {
+            "category": "loginpassword",
+            "metric": "latency",
+            "jurisdiction": "us-core-ps",
+            "query": "avg:identity.access_token_requests.95percentile{env:ps,grant_type:password}"
+        },
+        {
+            "category": "loginpassword",
+            "metric": "request-hits",
+            "jurisdiction": "us-core-ps",
+            "query": "sum:identity.access_token_requests.count{env:ps,service:identity,grant_type:password}.as_count()"
+        },
+        {
+            "category": "loginpassword",
+            "metric": "request-error",
+            "jurisdiction": "us-core-ps",
+            "query": "sum:identity.access_token_requests.count{env:ps,service:identity,grant_type:password}.as_count()"
         }
     ]
 }
