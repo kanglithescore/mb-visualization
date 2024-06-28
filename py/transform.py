@@ -3,7 +3,7 @@ Transform Datadog Metrics Data.
 
 This script processes a directory which contains subdirectories with CSV files of Datadog raw metrics data from extract.py
 It calculates min, average, and max values for each metric, and compiles the results into a summary CSV file.
-Optionally, it can produce a release output based on specific flags.
+Optionally, it can produce a release output based on specific --release flags.
 
 Usage:
     python transform.py <root_directory> 
@@ -72,7 +72,7 @@ def process_file(file):
     }
 
 def process_directory(directory_path, category):
-    """ Process all relevant CSV files in a directory for a given category."""
+    """Process all relevant CSV files in a directory for a given category."""
     metrics = {
         "request-rate.csv": None,
         "latency.csv": None,
