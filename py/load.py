@@ -10,7 +10,7 @@ Parameters:
     csv_file (str): The directory to the CSV file containing transaction data.
 
 Environment Variables:
-    METABASE_HOST (str): The hostname of the Metabase RDS PostgreSQL database. If not set, the default value is used.
+    METABASE_HOST (str): The hostname of the Metabase PostgreSQL database. If not set, the default value is used.
     METABASE_USER (str): The username for connecting to the Metabase PostgreSQL database.
     METABASE_PASSWORD (str): The password for connecting to the Metabase PostgreSQL database.
     METABASE_DB (str): The name of the Metabase PostgreSQL database.
