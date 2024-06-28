@@ -31,7 +31,7 @@ import time
 
 import psycopg2
 
-# The globle environment variables
+# TO-DO: Read from environment varaibles
 METABASE_HOST = os.getenv("METABASE_HOST", default="localhost")
 METABASE_USER = "perfeng"
 METABASE_PASSWORD = "shock"

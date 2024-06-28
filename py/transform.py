@@ -1,9 +1,54 @@
+"""
+Transform Datadog Metrics Data.
+
+This script processes a directory which contains subdirectories with CSV files of Datadog raw metrics data from extract.py
+It calculates min, average, and max values for each metric, and compiles the results into a summary CSV file.
+Optionally, it can produce a release output based on specific flags.
+
+Usage:
+    python transform.py <root_directory> 
+    python transform.py <root_directory> --release
+
+Parameters:
+    root_directory (str): The root directory containing the business flow subdirectories with CSV files.
+
+Environment Variables:
+    JOB (str): The job name. Default is 'load-test-sportsbook-and-casino'.
+    RUNNUMBER (str): The run number. Default is '001'.
+    PROJECT (str): The project name. Default is 'POC'.
+    PRODUCT (str): The product name.
+    RELEASE (str): The release version.
+    BUILD (str): The build version.
+    SERVICEBRANCH (str): The service branch.
+    DEPLOYBRANCH (str): The deploy branch.
+    TESTTYPE (str): The test type.
+    TESTNAME (str): The test name.
+    TESTSCRIPT (str): The test script.
+    DESCRIPTION (str): The description.
+    CLUSTER (str): The cluster.
+    ENVIRONMENT (str): The environment. Default is 'PS'.
+    DATASET (str): The dataset.
+    ISPEAK (str): Indicates if it's a peak. Default is 'false'.
+    VIRTUALUSERS (str): The number of virtual users.
+    TRANSACTIONNAME (str): The transaction name.
+    STEPDURATION (str): The step duration.
+
+Functions:
+    - process_file(file: str): Processes a single CSV file to calculate min, avg, max values and get time range.
+    - process_directory(directory_path: str, business_flow: str): Processes all relevant CSV files in a directory for a given business flow.
+    - main(): Main function to process metrics files for each business flow and compile results.
+
+Example:
+    python transform.py root_directory
+"""
+
 import pandas as pd
 import argparse
 import os
 from dotenv import load_dotenv
 
-def process_file(file, business_flow):
+def process_file(file):
+    """Process a single CSV file to calculate min, avg, max values and get time range."""
     print(f"Processing {file}")
     data = pd.read_csv(file)
     data['time'] = pd.to_datetime(data['timestamp'])
@@ -14,15 +59,32 @@ def process_file(file, business_flow):
     max_value = data['value'].max().round(2)
     start_time = data['time'].min()
     end_time = data['time'].max()
-    jurisdiction = data['jurisdiction'].iloc[0]  # Assuming jurisdiction is the same for all rows in the file
+     # Assuming jurisdiction is the same for all rows in the file
+    jurisdiction = data['jurisdiction'].iloc[0]
 
-    results = {business_flow: {"min": min_value,
-                               "avg": avg_value, 
-                               "max": max_value, 
-                               "start": start_time, 
-                               "end": end_time,
-                               "jurisdiction": jurisdiction}}
-    return results
+    return {
+        "min": min_value,
+        "avg": avg_value,
+        "max": max_value,
+        "start": start_time,
+        "end": end_time,
+        "jurisdiction": jurisdiction
+    }
+
+def process_directory(directory_path, category):
+    """ Process all relevant CSV files in a directory for a given category."""
+    metrics = {
+        "request-rate.csv": None,
+        "latency.csv": None,
+        "error-rate.csv": None
+    }
+
+    for file in os.listdir(directory_path):
+        if file in metrics:
+            file_path = os.path.join(directory_path, file)
+            metrics[file] = process_file(file_path)
+
+    return metrics
 
 def main():
     # Load environment variables from a .env file if it exists
@@ -36,69 +98,51 @@ def main():
     parser.add_argument('--release', default=False, action="store_true", help="Flag to produce the release output")
     
     args = parser.parse_args()
+    # Save output under the parent "transform" directory
+    output_dir = os.path.join(os.path.dirname(args.root_directory), 'transform')
+    # Ensure output directory exists
+    os.makedirs(output_dir, exist_ok=True)
     
-    output_dir = os.path.join(os.path.dirname(args.root_directory), 'transform')  # Save output under the parent "transform" directory
-    os.makedirs(output_dir, exist_ok=True)  # Ensure output directory exists
-    
+    # A list to insert to the database
     results_list = []
+    # A list values to get printed out in console to copy and paste for Release testing 
     release_output = []
 
     # Process each subdirectory
-    for business_flow in os.listdir(args.root_directory):
-        source_dir = os.path.join(args.root_directory, business_flow)
+    for category in os.listdir(args.root_directory):
+        source_dir = os.path.join(args.root_directory, category)
         
         # Ensure it's a directory
         if os.path.isdir(source_dir):
-            print(f"Processing business flow: {business_flow}")
+            print(f"Processing category: {category}")
+            metrics = process_directory(source_dir, category)
 
-            transactionspersecond_min = None
-            transactionspersecond_average = None
-            transactionspersecond_max = None
-            responsetime_min = None
-            responsetime_average = None
-            responsetime_max = None
-            errorspercent_min = None
-            errorspercent_average = None
-            errorspercent_max = None
-            timetart = None
-            timestop = None
-            jurisdiction = None
+            if metrics["request-rate.csv"]:
+                request_rate = metrics["request-rate.csv"]
+            else:
+                request_rate = {"min": None, "avg": None, "max": None, "start": None, "end": None, "jurisdiction": None}
 
-            for file in os.listdir(source_dir):
-                if file in ("latency.csv", "request-rate.csv", "error-rate.csv"):
-                    csv_file = os.path.join(source_dir, file)
-                    results = process_file(csv_file, business_flow)          
-                    if file == "request-rate.csv":
-                        transactionspersecond_min  = results[business_flow]["min"]
-                        transactionspersecond_average = results[business_flow]["avg"]
-                        transactionspersecond_max = results[business_flow]["max"]
-                        timetart = results[business_flow]["start"]
-                        timestop = results[business_flow]["end"]
-                        jurisdiction = results[business_flow]["jurisdiction"]
-                    if file == "error-rate.csv":
-                        errorspercent_min  = results[business_flow]["min"]
-                        errorspercent_average = results[business_flow]["avg"]
-                        errorspercent_max = results[business_flow]["max"]
-                        timetart = results[business_flow]["start"]
-                        timestop = results[business_flow]["end"]
-                        jurisdiction = results[business_flow]["jurisdiction"]
-                    if file == "latency.csv":
-                        responsetime_min = results[business_flow]["min"]
-                        responsetime_average = results[business_flow]["avg"]
-                        responsetime_max = results[business_flow]["max"]
-                        timetart = results[business_flow]["start"]
-                        timestop = results[business_flow]["end"]
-                        jurisdiction = results[business_flow]["jurisdiction"]
+            if metrics["latency.csv"]:
+                latency = metrics["latency.csv"]
+            else:
+                latency = {"min": None, "avg": None, "max": None, "start": None, "end": None, "jurisdiction": None}
+
+            if metrics["error-rate.csv"]:
+                error_rate = metrics["error-rate.csv"]
+            else:
+                error_rate = {"min": None, "avg": None, "max": None, "start": None, "end": None, "jurisdiction": None}
 
             if args.release:
-                release_output.append({business_flow: {
-                    "avg_requests_rate": transactionspersecond_average,
-                    "max_requests_rate": transactionspersecond_max,
-                    "avg_latency": responsetime_average,
-                    "max_latency": responsetime_max,    
-                    "avg_errorspercent": errorspercent_average,
-                    "max_errorspercent": errorspercent_max
-                }})
+                release_output.append({
+                    category: {
+                        "avg_requests_rate": request_rate["avg"],
+                        "max_requests_rate": request_rate["max"],
+                        "avg_latency": latency["avg"],
+                        "max_latency": latency["max"],
+                        "avg_errorspercent": error_rate["avg"],
+                        "max_errorspercent": error_rate["max"]
+                    }
+                })
 
             results_list.append({
                 'job': args.job,
@@ -113,21 +157,21 @@ def main():
                 'testname': os.getenv('TESTNAME'),
                 'testscript': os.getenv('TESTSCRIPT'),
                 'description': os.getenv('DESCRIPTION'),
-                'jurisdiction': jurisdiction,
+                'jurisdiction': request_rate["jurisdiction"] or latency["jurisdiction"] or error_rate["jurisdiction"],
                 'cluster': os.getenv('CLUSTER'),
-                'environment': os.getenv('ENVIRONMENT', 'PS'),
+                'environment': os.getenv('ENVIRONMENT', 'ps'),
                 'dataset': os.getenv('DATASET'),
-                'timetart': timetart,
-                'timestop': timestop,
+                'timetart': request_rate["start"] or latency["start"] or error_rate["start"],
+                'timestop': request_rate["end"] or latency["end"] or error_rate["end"],
                 'ispeak': os.getenv('ISPEAK', 'false'),
                 'virtualusers': os.getenv('VIRTUALUSERS'),
-                'businessprocess': business_flow,
+                'businessprocess': category,
                 'transactionname': os.getenv('TRANSACTIONNAME'),
-                'transactionspersecond': transactionspersecond_average,
-                'responsetimemin': responsetime_min,
-                'responsetimeaverage': responsetime_average,
-                'responsetimemax': responsetime_max,
-                'errorspercent': errorspercent_average,
+                'transactionspersecond': request_rate["avg"],
+                'responsetimemin': latency["min"],
+                'responsetimeaverage': latency["avg"],
+                'responsetimemax': latency["max"],
+                'errorspercent': error_rate["avg"],
                 'stepduration': os.getenv('STEPDURATION')
             })
 
@@ -139,9 +183,12 @@ def main():
     results_df.to_csv(output_filename, index=False)
     print(f"Output saved to {output_filename}")
 
+    # Print out the values to copy it to release excel in the specific desired order
     if args.release:
-        desired_order = ['sportsbook', 'concierge', 'edgebook', 'vegas', 'identity', 'corebook', 'promotions', 'casino', 'scorepay',
-                        'placebets', 'validatebets', 'deposits', 'withdrawal', 'cashouttrigger', 'loginpassword', 'loginrefreshtoken']
+        desired_order = [
+            'sportsbook', 'concierge', 'edgebook', 'vegas', 'identity', 'corebook', 'promotions', 'casino', 'scorepay',
+            'placebets', 'validatebets', 'deposits', 'withdrawal', 'cashouttrigger', 'loginpassword', 'loginrefreshtoken'
+        ]
 
         # Custom sort key function
         def sort_key(item):
