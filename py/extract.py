@@ -3,6 +3,7 @@ import os
 import argparse
 from datadog import initialize, api
 from datetime import datetime
+from dotenv import load_dotenv
 import pandas as pd
 
 # Initialize Datadog API keys from environment variables
@@ -46,6 +47,7 @@ def extract(query, start_at, end_at, time_delta, jurisdiction, default_timestamp
 
     if not datetime_list and default_timestamps is not None:
         datetime_list = default_timestamps
+        # In case no value from the response
         value_list = [0] * len(default_timestamps)
         jurisdiction_list = [jurisdiction] * len(default_timestamps)
     else:
