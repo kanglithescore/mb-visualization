@@ -33,6 +33,7 @@ def main():
     parser.add_argument('--job', type=str, default=os.getenv('JOB', 'load-test-sportsbook-and-casino'), help='Job name')
     parser.add_argument('--run_number', type=str, default=os.getenv('RUNNUMBER', '873'), help='Run number')
     parser.add_argument('--project', type=str, default=os.getenv('PROJECT', 'POC'), help='Project name')
+    parser.add_argument('--release', default=False, action="store_true", help="Flag to produce the release output")
     
     args = parser.parse_args()
     
@@ -40,6 +41,7 @@ def main():
     os.makedirs(output_dir, exist_ok=True)  # Ensure output directory exists
     
     results_list = []
+    release_output = []
 
     # Process each subdirectory
     for business_flow in os.listdir(args.root_directory):
@@ -49,30 +51,54 @@ def main():
         if os.path.isdir(source_dir):
             print(f"Processing business flow: {business_flow}")
 
-            responsetimemin = None
-            responsetimeaverage = None
-            responsetimemax = None
+            transactionspersecond_min = None
+            transactionspersecond_average = None
+            transactionspersecond_max = None
+            responsetime_min = None
+            responsetime_average = None
+            responsetime_max = None
+            errorspercent_min = None
+            errorspercent_average = None
+            errorspercent_max = None
             timetart = None
             timestop = None
             jurisdiction = None
-            transactionspersecond = None
-            errorspercent = None
 
             for file in os.listdir(source_dir):
                 if file in ("latency.csv", "request-rate.csv", "error-rate.csv"):
                     csv_file = os.path.join(source_dir, file)
                     results = process_file(csv_file, business_flow)          
-                    if file == "latency.csv":
-                        responsetimemin = results[business_flow]["min"]
-                        responsetimeaverage = results[business_flow]["avg"]
-                        responsetimemax = results[business_flow]["max"]
+                    if file == "request-rate.csv":
+                        transactionspersecond_min  = results[business_flow]["min"]
+                        transactionspersecond_average = results[business_flow]["avg"]
+                        transactionspersecond_max = results[business_flow]["max"]
                         timetart = results[business_flow]["start"]
                         timestop = results[business_flow]["end"]
                         jurisdiction = results[business_flow]["jurisdiction"]
-                    if file == "request-rate.csv":
-                        transactionspersecond = results[business_flow]["avg"]
                     if file == "error-rate.csv":
-                        errorspercent = results[business_flow]["avg"]
+                        errorspercent_min  = results[business_flow]["min"]
+                        errorspercent_average = results[business_flow]["avg"]
+                        errorspercent_max = results[business_flow]["max"]
+                        timetart = results[business_flow]["start"]
+                        timestop = results[business_flow]["end"]
+                        jurisdiction = results[business_flow]["jurisdiction"]
+                    if file == "latency.csv":
+                        responsetime_min = results[business_flow]["min"]
+                        responsetime_average = results[business_flow]["avg"]
+                        responsetime_max = results[business_flow]["max"]
+                        timetart = results[business_flow]["start"]
+                        timestop = results[business_flow]["end"]
+                        jurisdiction = results[business_flow]["jurisdiction"]
+
+            if args.release:
+                release_output.append({business_flow: {
+                    "avg_requests_rate": transactionspersecond_average,
+                    "max_requests_rate": transactionspersecond_max,
+                    "avg_latency": responsetime_average,
+                    "max_latency": responsetime_max,    
+                    "avg_errorspercent": errorspercent_average,
+                    "max_errorspercent": errorspercent_max
+                }})
 
             results_list.append({
                 'job': args.job,
@@ -97,21 +123,41 @@ def main():
                 'virtualusers': os.getenv('VIRTUALUSERS'),
                 'businessprocess': business_flow,
                 'transactionname': os.getenv('TRANSACTIONNAME'),
-                'transactionspersecond': transactionspersecond,
-                'responsetimemin': responsetimemin,
-                'responsetimeaverage': responsetimeaverage,
-                'responsetimemax': responsetimemax,
-                'errorspercent': errorspercent,
+                'transactionspersecond': transactionspersecond_average,
+                'responsetimemin': responsetime_min,
+                'responsetimeaverage': responsetime_average,
+                'responsetimemax': responsetime_max,
+                'errorspercent': errorspercent_average,
                 'stepduration': os.getenv('STEPDURATION')
             })
 
     # Compile all results into one DataFrame
     results_df = pd.DataFrame(results_list)
-    
+
     # Construct output filename
     output_filename = os.path.join(output_dir, "transform_aggregated_metrics.csv")
     results_df.to_csv(output_filename, index=False)
     print(f"Output saved to {output_filename}")
+
+    if args.release:
+        desired_order = ['sportsbook', 'concierge', 'edgebook', 'vegas', 'identity', 'corebook', 'promotions', 'casino', 'scorepay',
+                        'placebets', 'validatebets', 'deposits', 'withdrawal', 'cashouttrigger', 'loginpassword', 'loginrefreshtoken']
+
+        # Custom sort key function
+        def sort_key(item):
+            key = list(item.keys())[0]
+            if key in desired_order:
+                return desired_order.index(key)
+            return len(desired_order)
+
+        # Sort the list
+        sorted_data = sorted(release_output, key=sort_key)
+        # Extract the values and flatten them
+        flattened_values = [value for item in sorted_data for sub_dict in item.values() for value in sub_dict.values()]
+
+        # Join the values with commas
+        result = ', '.join(map(str, flattened_values))
+        print(result)
 
 if __name__ == "__main__":
     main()
