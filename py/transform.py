@@ -94,8 +94,8 @@ def main():
     parser = argparse.ArgumentParser(description="Process metrics files for each business flow.")
     parser.add_argument('root_directory', type=str, help='Root directory containing the business flow subdirectories')
     parser.add_argument('--job', type=str, default=os.getenv('JOB', 'load-test-sportsbook-and-casino'), help='Job name')
-    parser.add_argument('--run_number', type=str, default=os.getenv('RUNNUMBER', '873'), help='Run number')
-    parser.add_argument('--project', type=str, default=os.getenv('PROJECT', 'POC'), help='Project name')
+    parser.add_argument('--run_number', type=str, default=os.getenv('RUNNUMBER', '0'), help='Run number')
+    parser.add_argument('--project', type=str, default=os.getenv('PROJECT', 'Dummy'), help='Project name')
     parser.add_argument('--release', default=False, action="store_true", help="Flag to produce the release output")
     
     args = parser.parse_args()

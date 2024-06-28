@@ -6,6 +6,8 @@ from datetime import datetime
 from dotenv import load_dotenv
 import pandas as pd
 
+# Load environment variables from a .env file if it exists
+load_dotenv()
 # Initialize Datadog API keys from environment variables
 options = {
     'api_key': os.getenv('DATADOG_API_KEY'),
@@ -126,9 +128,6 @@ def parse_args():
 
 def main():
     """Main fucntion."""
-    # Load environment variables from a .env file if it exists
-    load_dotenv()
-
     args = parse_args()
     queries = load_queries(args.config)
     run_queries(queries, args.start, args.end, args.time_delta)

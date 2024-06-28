@@ -31,6 +31,8 @@ import time
 from dotenv import load_dotenv
 import psycopg2
 
+# Load environment variables from a .env file if it exists
+load_dotenv()
 # Read from environment varaibles
 METABASE_HOST = os.getenv("METABASE_HOST", default="localhost")
 METABASE_USER = os.getenv("METABASE_USER")
@@ -81,8 +83,6 @@ def process_directory(directory: str):
 
 def main():
     """Main fucntion."""
-    # Load environment variables from a .env file if it exists
-    load_dotenv()
 
     parser = argparse.ArgumentParser(description='Process CSV files contained in a directory and write to Metabase DB.')
     parser.add_argument('directory', type=str, help='The directory containing CSV files to process.')
