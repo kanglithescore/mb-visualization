@@ -28,15 +28,15 @@ import argparse
 import csv
 import os
 import time
-
+from dotenv import load_dotenv
 import psycopg2
 
-# TO-DO: Read from environment varaibles
+# Read from environment varaibles
 METABASE_HOST = os.getenv("METABASE_HOST", default="localhost")
-METABASE_USER = "perfeng"
-METABASE_PASSWORD = "shock"
-METABASE_DB = "perfreporting"
-METABASE_PORT = "5432"
+METABASE_USER = os.getenv("METABASE_USER")
+METABASE_PASSWORD = os.getenv("METABASE_PASSWORD")
+METABASE_DB = os.getenv("METABASE_DB")
+METABASE_PORT = os.getenv("METABASE_PORT")
 
 
 def read_csv_and_write_to_db(csv_file: str):
@@ -45,7 +45,6 @@ def read_csv_and_write_to_db(csv_file: str):
         reader = csv.DictReader(file)
         for row in reader:
             write_transaction_metabase(row)
-
 
 def write_transaction_metabase(txn_summary: dict):
     """Write transaction summary metric to metabase postgresql database."""
@@ -72,7 +71,6 @@ def write_transaction_metabase(txn_summary: dict):
             connection.close()
             print("Metabase PostgreSQL connection is closed")
 
-
 def process_directory(directory: str):
     """Process each CSV file in the specified directory."""
     for filename in os.listdir(directory):
@@ -81,10 +79,15 @@ def process_directory(directory: str):
             print(f"Processing file: {csv_file}")
             read_csv_and_write_to_db(csv_file)
 
+def main():
+    """Main fucntion."""
+    # Load environment variables from a .env file if it exists
+    load_dotenv()
 
-if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Process CSV files contained in a directory and write to Metabase DB.')
     parser.add_argument('directory', type=str, help='The directory containing CSV files to process.')
     args = parser.parse_args()
-
     process_directory(args.directory)
+
+if __name__ == '__main__':
+    main()

@@ -20,7 +20,7 @@ def load_queries(config_file):
     return config['queries']
 
 # Function to extract data for a given query
-def extract(query, start_at, end_at, time_delta, jurisdiction, default_timestamps=None):
+def extract(category, query, start_at, end_at, time_delta, jurisdiction, default_timestamps=None):
     print(f'Running extraction for query: {query["metric"]}')
 
     datetime_list = []
@@ -37,10 +37,11 @@ def extract(query, start_at, end_at, time_delta, jurisdiction, default_timestamp
                 timestamp = time_value_pair_list[0] / 1000
                 converted_datetime = datetime.utcfromtimestamp(timestamp).strftime('%Y-%m-%dT%H:%M:%S.%f')[:-3] + 'Z'
                 datetime_list.append(converted_datetime)
-                if query["metric"].startswith("latency"):
-                    value_list.append(time_value_pair_list[1] * 1000)  # Convert to milliseconds
+                if query["metric"].startswith("latency") and not category.startswith("login"):
+                     # Convert to milliseconds
+                    value_list.append(round(time_value_pair_list[1] * 1000, 2))
                 else:
-                    value_list.append(time_value_pair_list[1])
+                    value_list.append(round(time_value_pair_list[1], 2))
                 metric_list.append(datadog_result['metric'])
 
         iteration_start = iteration_end
@@ -95,7 +96,7 @@ def run_queries(queries, start, end, time_delta):
         if not os.path.exists(category_dir):
             os.makedirs(category_dir)
         
-        data_metrics = extract(query, start, end, time_delta, jurisdiction, default_timestamps)
+        data_metrics = extract(query['category'], query, start, end, time_delta, jurisdiction, default_timestamps)
         
         if default_timestamps is None:
             default_timestamps = data_metrics['timestamp'].tolist()
@@ -123,7 +124,14 @@ def parse_args():
     parser.add_argument('--config', type=str, default='queries.json', help='Path to JSON configuration file (default: queries.json)')
     return parser.parse_args()
 
-if __name__ == '__main__':
+def main():
+    """Main fucntion."""
+    # Load environment variables from a .env file if it exists
+    load_dotenv()
+
     args = parse_args()
     queries = load_queries(args.config)
     run_queries(queries, args.start, args.end, args.time_delta)
+
+if __name__ == '__main__':
+    main()
